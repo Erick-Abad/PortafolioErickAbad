@@ -6,9 +6,15 @@ const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Middleware
+// Configurar CORS para permitir solicitudes desde tu frontend
+const corsOptions = {
+  origin: ["https://portafolio-erick-abad.vercel.app"], // Agrega aquí tu dominio en Vercel
+  methods: "POST",
+  allowedHeaders: ["Content-Type"]
+};
+
+app.use(cors(corsOptions));
 app.use(express.json());
-app.use(cors());
 
 // Configurar el transportador de Nodemailer
 const transporter = nodemailer.createTransport({
