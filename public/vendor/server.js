@@ -6,17 +6,16 @@ const cors = require("cors");
 const app = express();
 const PORT = process.env.PORT || 3001;
 
-// Configurar CORS para permitir solicitudes desde tu frontend
-const corsOptions = {
-  origin: ["https://portafolio-erick-abad.vercel.app"], // Agrega aquí tu dominio en Vercel
+// Configurar CORS correctamente
+app.use(cors({
+  origin: "*", // Puedes cambiar "*" por "https://portafolio-erick-abad.vercel.app" si quieres más seguridad.
   methods: "POST",
   allowedHeaders: ["Content-Type"]
-};
+}));
 
-app.use(cors(corsOptions));
 app.use(express.json());
 
-// Configurar el transportador de Nodemailer
+// Configurar Nodemailer
 const transporter = nodemailer.createTransport({
   service: "gmail",
   auth: {
@@ -27,6 +26,10 @@ const transporter = nodemailer.createTransport({
 
 // Ruta para manejar el envío del formulario
 app.post("/api/send-email", async (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*"); // Asegurar CORS en la respuesta
+  res.setHeader("Access-Control-Allow-Methods", "POST");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+
   const { name, email, subject, message } = req.body;
 
   if (!name || !email || !subject || !message) {
@@ -47,6 +50,14 @@ app.post("/api/send-email", async (req, res) => {
     console.error("Error al enviar el correo:", error);
     res.status(500).json({ success: false, message: "Error al enviar el correo." });
   }
+});
+
+// Manejo de preflight requests para CORS (IMPORTANTE)
+app.options("/api/send-email", (req, res) => {
+  res.setHeader("Access-Control-Allow-Origin", "*");
+  res.setHeader("Access-Control-Allow-Methods", "POST");
+  res.setHeader("Access-Control-Allow-Headers", "Content-Type");
+  res.sendStatus(204);
 });
 
 // Iniciar el servidor
