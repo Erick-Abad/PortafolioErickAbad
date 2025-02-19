@@ -143,7 +143,7 @@
    * Configuración del formulario de contacto con servidor en Vercel
    */
   const API_URL = window.location.origin.includes("localhost")
-    ? "http://localhost:3000/api/send-email"
+    ? "http://localhost:3001/api/send-email"
     : "https://presentacion-green.vercel.app/api/send-email";
 
   document.addEventListener("DOMContentLoaded", function () {
@@ -157,16 +157,13 @@
     contactForm.addEventListener("submit", async function (event) {
       event.preventDefault();
 
-      const formData = {
-        name: document.getElementById("name").value.trim(),
-        email: document.getElementById("email").value.trim(),
-        subject: document.getElementById("subject").value.trim(),
-        message: document.getElementById("message").value.trim()
-      };
+      const name = document.getElementById("name").value.trim();
+      const email = document.getElementById("email").value.trim();
+      const subject = document.getElementById("subject").value.trim();
+      const message = document.getElementById("message").value.trim();
 
-      if (!formData.name || !formData.email || !formData.subject || !formData.message) {
-        document.querySelector(".error-message").textContent = "⚠️ Todos los campos son obligatorios.";
-        document.querySelector(".error-message").style.display = "block";
+      if (!name || !email || !subject || !message) {
+        showErrorMessage("⚠️ Todos los campos son obligatorios.");
         return;
       }
 
@@ -174,27 +171,46 @@
         const response = await fetch(API_URL, {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(formData)
+          body: JSON.stringify({ name, email, subject, message })
         });
 
         const result = await response.json();
 
         if (result.success) {
-          document.querySelector(".sent-message").textContent = "✅ ¡Mensaje enviado con éxito!";
-          document.querySelector(".sent-message").style.display = "block";
-          document.querySelector(".error-message").style.display = "none";
+          showSuccessMessage("✅ ¡Mensaje enviado con éxito!");
           contactForm.reset();
         } else {
-          document.querySelector(".error-message").textContent = `❌ ${result.message}`;
-          document.querySelector(".error-message").style.display = "block";
+          showErrorMessage(`❌ ${result.message}`);
         }
       } catch (error) {
         console.error("❌ Error en la solicitud fetch:", error);
-        document.querySelector(".error-message").textContent = "❌ Error en la conexión con el servidor.";
-        document.querySelector(".error-message").style.display = "block";
+        showErrorMessage("❌ Error en la conexión con el servidor.");
       }
     });
   });
+
+  /**
+   * Función para mostrar mensajes de error
+   */
+  function showErrorMessage(message) {
+    const errorMessage = document.querySelector(".error-message");
+    if (errorMessage) {
+      errorMessage.textContent = message;
+      errorMessage.style.display = "block";
+    }
+  }
+
+  /**
+   * Función para mostrar mensajes de éxito
+   */
+  function showSuccessMessage(message) {
+    const successMessage = document.querySelector(".sent-message");
+    if (successMessage) {
+      successMessage.textContent = message;
+      successMessage.style.display = "block";
+      document.querySelector(".error-message").style.display = "none";
+    }
+  }
 
   /**
    * Animation on scroll
