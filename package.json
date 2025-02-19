@@ -1,14 +1,12 @@
 {
   "name": "portafolio-erick",
   "version": "1.0.0",
+  "description": "Portafolio de Erick Abad",
   "main": "index.js",
-  "scripts": {
-  "start": "node public/server.js"
-},
+  "scripts": {},
   "keywords": [],
   "author": "",
   "license": "ISC",
-  "description": "",
   "dependencies": {
     "cors": "^2.8.5",
     "dotenv": "^16.4.7",

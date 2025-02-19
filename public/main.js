@@ -143,8 +143,8 @@
    * Configuración del formulario de contacto con servidor en Vercel
    */
   const API_URL = window.location.origin.includes("localhost")
-    ? "http://localhost:3001/api/send-email"
-    : "https://presentacion-green.vercel.app/api/send-email";
+    ? "http://localhost:3000/api/send-email"
+    : "https://portafolio-erick-abad.vercel.app/api/send-email";
 
   document.addEventListener("DOMContentLoaded", function () {
     const contactForm = document.getElementById("contactForm");
