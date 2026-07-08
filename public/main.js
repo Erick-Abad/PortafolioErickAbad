@@ -147,46 +147,193 @@
     : "https://portafolio-erick-abad.vercel.app/api/send-email";
 
   document.addEventListener("DOMContentLoaded", function () {
+    // ===== Contacto =====
     const contactForm = document.getElementById("contactForm");
 
     if (!contactForm) {
       console.error("❌ No se encontró el formulario con el ID 'contactForm'");
-      return;
+    } else {
+      contactForm.addEventListener("submit", async function (event) {
+        event.preventDefault();
+
+        const name = document.getElementById("name").value.trim();
+        const email = document.getElementById("email").value.trim();
+        const subject = document.getElementById("subject").value.trim();
+        const message = document.getElementById("message").value.trim();
+
+        if (!name || !email || !subject || !message) {
+          showErrorMessage("⚠️ Todos los campos son obligatorios.");
+          return;
+        }
+
+        try {
+          const response = await fetch(API_URL, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({ name, email, subject, message })
+          });
+
+          let result = {};
+          try {
+            result = await response.json();
+          } catch (_) {
+            result = { success: false, message: "Respuesta inválida del servidor." };
+          }
+
+          if (response.ok && result.success) {
+            showSuccessMessage("✅ ¡Mensaje enviado con éxito!");
+            contactForm.reset();
+          } else {
+            showErrorMessage(`❌ ${result.message || "No se pudo enviar el mensaje."}`);
+          }
+        } catch (error) {
+          console.error("❌ Error en la solicitud fetch:", error);
+          showErrorMessage("❌ Error en la conexión con el servidor.");
+        }
+      });
     }
 
-    contactForm.addEventListener("submit", async function (event) {
-      event.preventDefault();
+    // ===== Testimonios (propios) =====
+    const testimonialItems = document.getElementById("testimonialItems");
+    const testimonialEmpty = document.getElementById("testimonialEmpty");
+    const tNombre = document.getElementById("t_nombre");
+    const tCargo = document.getElementById("t_cargo");
+    const tTexto = document.getElementById("t_texto");
+    const tFoto = document.getElementById("t_foto");
+    const tEnviar = document.getElementById("t_enviar");
+    const tMsg = document.getElementById("t_msg");
 
-      const name = document.getElementById("name").value.trim();
-      const email = document.getElementById("email").value.trim();
-      const subject = document.getElementById("subject").value.trim();
-      const message = document.getElementById("message").value.trim();
+    const STORAGE_KEY = "erick_portafolio_testimonios_v1";
 
-      if (!name || !email || !subject || !message) {
-        showErrorMessage("⚠️ Todos los campos son obligatorios.");
+    const readTestimonials = () => {
+      try {
+        const raw = localStorage.getItem(STORAGE_KEY);
+        if (!raw) return [];
+        const data = JSON.parse(raw);
+        return Array.isArray(data) ? data : [];
+      } catch (_) {
+        return [];
+      }
+    };
+
+    const saveTestimonials = (items) => {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(items));
+    };
+
+    const escapeHtml = (str) => {
+      const s = String(str);
+      return s
+        .replace(/&/g, "&amp;")
+        .replace(/</g, "<")
+        .replace(/>/g, ">")
+        .replace(/"/g, """)
+        .replace(/'/g, "&#039;");
+    };
+
+    const renderTestimonials = () => {
+      if (!testimonialItems) return;
+
+      const items = readTestimonials();
+      testimonialItems.innerHTML = "";
+
+      if (!items.length) {
+        if (testimonialEmpty) testimonialEmpty.style.display = "block";
         return;
       }
 
-      try {
-        const response = await fetch(API_URL, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ name, email, subject, message })
+      if (testimonialEmpty) testimonialEmpty.style.display = "none";
+
+      items
+        .slice()
+        .reverse()
+        .forEach((t) => {
+          const wrap = document.createElement("div");
+          wrap.className = "testimonial-card";
+
+          const fotoSrc = t.fotoBase64 ? `data:image/*;base64,${t.fotoBase64}` : "";
+          wrap.innerHTML = `
+            <div class="testimonial-card-inner">
+              <img class="testimonial-avatar" src="${fotoSrc || ""}" alt="${escapeHtml(t.nombre || "Foto")}" />
+              <div class="testimonial-body">
+                <h4 class="testimonial-name">${escapeHtml(t.nombre || "Anónimo")}</h4>
+                ${t.cargo ? `<div class="testimonial-role">${escapeHtml(t.cargo)}</div>` : ""}
+                <p class="testimonial-text">${escapeHtml(t.texto || "")}</p>
+                <div class="testimonial-date">${escapeHtml(t.fecha || "")}</div>
+              </div>
+            </div>
+          `;
+
+          testimonialItems.appendChild(wrap);
         });
+    };
 
-        const result = await response.json();
+    const fileToBase64 = (file) => {
+      return new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = () => {
+          // reader.result: data:*/*;base64,XXXX
+          const res = String(reader.result || "");
+          const idx = res.indexOf("base64,");
+          if (idx === -1) return resolve("");
+          resolve(res.slice(idx + "base64,".length));
+        };
+        reader.onerror = reject;
+        reader.readAsDataURL(file);
+      });
+    };
 
-        if (result.success) {
-          showSuccessMessage("✅ ¡Mensaje enviado con éxito!");
-          contactForm.reset();
-        } else {
-          showErrorMessage(`❌ ${result.message}`);
+    const showTestimonialMsg = (message, isError = false) => {
+      if (!tMsg) return;
+      tMsg.textContent = message;
+      tMsg.style.display = "block";
+      tMsg.style.color = isError ? "#b00020" : "#0b6b2f";
+    };
+
+    if (tEnviar && testimonialItems) {
+      renderTestimonials();
+
+      tEnviar.addEventListener("click", async function () {
+        const nombre = (tNombre?.value || "").trim();
+        const cargo = (tCargo?.value || "").trim();
+        const texto = (tTexto?.value || "").trim();
+
+        if (!nombre || !texto) {
+          showTestimonialMsg("⚠️ Nombre y testimonio son obligatorios.", true);
+          return;
         }
-      } catch (error) {
-        console.error("❌ Error en la solicitud fetch:", error);
-        showErrorMessage("❌ Error en la conexión con el servidor.");
-      }
-    });
+
+        let fotoBase64 = "";
+        if (tFoto && tFoto.files && tFoto.files[0]) {
+          const file = tFoto.files[0];
+          if (file.size > 3 * 1024 * 1024) {
+            showTestimonialMsg("⚠️ La foto debe pesar menos de 3MB.", true);
+            return;
+          }
+          try {
+            fotoBase64 = await fileToBase64(file);
+          } catch (_) {
+            showTestimonialMsg("❌ No se pudo leer la foto. Inténtalo nuevamente.", true);
+            return;
+          }
+        }
+
+        const fecha = new Date();
+        const fechaStr = fecha.toLocaleString("es-EC");
+
+        const items = readTestimonials();
+        items.push({ nombre, cargo, texto, fotoBase64, fecha: fechaStr });
+        saveTestimonials(items);
+
+        // reset
+        if (tNombre) tNombre.value = "";
+        if (tCargo) tCargo.value = "";
+        if (tTexto) tTexto.value = "";
+        if (tFoto) tFoto.value = "";
+
+        showTestimonialMsg("✅ Testimonio publicado (guardado en este navegador).");
+        renderTestimonials();
+      });
+    }
   });
 
   /**
@@ -208,7 +355,8 @@
     if (successMessage) {
       successMessage.textContent = message;
       successMessage.style.display = "block";
-      document.querySelector(".error-message").style.display = "none";
+      const err = document.querySelector(".error-message");
+      if (err) err.style.display = "none";
     }
   }
 

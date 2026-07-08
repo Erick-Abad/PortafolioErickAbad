@@ -573,52 +573,62 @@
       </div>
     </section><!-- End Services Section -->
 
-    <!-- ======= Testimonials Section ======= -->
+    <!-- ======= Sección propia de Testimonios (comentarios) ======= -->
     <section id="testimonials" class="testimonials section-bg">
       <div class="container">
 
         <div class="section-title">
           <h2>Testimonios</h2>
-          <p>"Te compartiré mis testimonios más destacados para que conozcas la experiencia de quienes han trabajado conmigo. ¡Espero que te inspiren y te ayuden a tomar la mejor decisión!"</p>
+          <p>Comparte tu experiencia conmigo. Puedes adjuntar tu foto y tu comentario se mostrará aquí.</p>
         </div>
 
-        <div class="testimonials-slider swiper" data-aos="fade-up" data-aos-delay="100">
-          <div class="swiper-wrapper">
+        <!-- Formulario de testimonios -->
+        <div class="row" data-aos="fade-up">
+          <div class="col-lg-5">
+            <div class="testimonial-form-card">
+              <h3 class="testimonial-form-title">Dejar un comentario</h3>
 
-            <div class="swiper-slide">
-              <div class="testimonial-item" data-aos="fade-up">
-                <p>
-                  <i class="bx bxs-quote-alt-left quote-icon-left"></i>
-                  Un colaborador con mucho conocimiento y ideas para aportar en cualquier area que se le asigne. 
-                   <i class="bx bxs-quote-alt-right quote-icon-right"></i>
-                </p>
-                <img src="img/testimonials/Garcia.png" class="testimonial-img" alt="">
-                <h3>Ing. Fernando Garcia</h3>
-                <h4> Jefe de logistica &amp; Encargado de Bodega</h4>
+              <div class="form-group">
+                <label for="t_nombre">Tu nombre</label>
+                <input id="t_nombre" type="text" class="form-control" maxlength="60" placeholder="Ej: Juan Pérez" />
               </div>
-            </div><!-- End testimonial item -->
 
-            <div class="swiper-slide">
-              <div class="testimonial-item" data-aos="fade-up" data-aos-delay="100">
-                <p>
-                  <i class="bx bxs-quote-alt-left quote-icon-left"></i>
-                  
-                  Tiene Buen conocimiento como Programador junior, y mucha dedicacion en su trabajo 
-                  <i class="bx bxs-quote-alt-right quote-icon-right"></i>
-                </p>
-                <img src="img/testimonials/testimonials-1.jpg" class="testimonial-img" alt="">
-                <h3>Ing. Mayra Reyes</h3>
-                <h4>CEO jefa de Marketing</h4>
+              <div class="form-group">
+                <label for="t_cargo">Tu cargo (opcional)</label>
+                <input id="t_cargo" type="text" class="form-control" maxlength="60" placeholder="Ej: Cliente / Coordinador" />
               </div>
-            </div><!-- End testimonial item -->
 
+              <div class="form-group">
+                <label for="t_foto">Foto de perfil</label>
+                <input id="t_foto" type="file" accept="image/*" class="form-control" />
+                <small class="testimonial-help">Se guardará en este navegador (para que se vea tu foto y tu comentario).</small>
+              </div>
 
+              <div class="form-group">
+                <label for="t_texto">Tu testimonio</label>
+                <textarea id="t_texto" class="form-control" rows="5" maxlength="500" placeholder="Escribe tu experiencia..."></textarea>
+              </div>
+
+              <div class="testimonial-form-actions">
+                <button id="t_enviar" type="button" class="btn btn-primary">Publicar testimonio</button>
+                <div id="t_msg" class="testimonial-form-message" role="status" aria-live="polite"></div>
+              </div>
+            </div>
           </div>
-          <div class="swiper-pagination"></div>
+
+          <!-- Listado de testimonios -->
+          <div class="col-lg-7 mt-4 mt-lg-0">
+            <div class="testimonial-list">
+              <div id="testimonialItems" class="testimonial-items"></div>
+              <div class="testimonial-empty" id="testimonialEmpty">
+                Aún no hay comentarios. ¡Sé el primero en dejar el tuyo!
+              </div>
+            </div>
+          </div>
         </div>
 
       </div>
-    </section><!-- End Testimonials Section -->
+    </section><!-- End Testimonios (propios) -->
 
     <!-- ======= Contact Section ======= -->
     <section id="contact" class="contact">
