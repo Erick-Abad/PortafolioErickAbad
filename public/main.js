@@ -174,13 +174,18 @@
           body: JSON.stringify({ name, email, subject, message })
         });
 
-        const result = await response.json();
+        let result = {};
+        try {
+          result = await response.json();
+        } catch (_) {
+          result = { success: false, message: "Respuesta inválida del servidor." };
+        }
 
-        if (result.success) {
+        if (response.ok && result.success) {
           showSuccessMessage("✅ ¡Mensaje enviado con éxito!");
           contactForm.reset();
         } else {
-          showErrorMessage(`❌ ${result.message}`);
+          showErrorMessage(`❌ ${result.message || "No se pudo enviar el mensaje."}`);
         }
       } catch (error) {
         console.error("❌ Error en la solicitud fetch:", error);
